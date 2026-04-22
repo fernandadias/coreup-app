@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "coreup-scaffold",
-    "slug": "coreup-scaffold",
-    "version": "1.0.0",
+    "name": "CoreUp",
+    "slug": "coreup-app",
+    "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "coreupscaffold",
+    "scheme": "coreup",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
