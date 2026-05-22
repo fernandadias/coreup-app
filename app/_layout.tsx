@@ -17,6 +17,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import '../global.css';
+import { useStore } from '../src/store';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -32,8 +33,9 @@ export default function RootLayout() {
     Inter_600SemiBold,
     Inter_700Bold,
   });
+  const hasHydrated = useStore((s) => s._hasHydrated);
 
-  const ready = genosLoaded && interLoaded;
+  const ready = genosLoaded && interLoaded && hasHydrated;
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync();
@@ -45,6 +47,10 @@ export default function RootLayout() {
     <>
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#09090B' } }}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen
+          name="execute/[workoutId]"
+          options={{ presentation: 'modal', gestureEnabled: false }}
+        />
       </Stack>
       <StatusBar style="light" />
     </>

@@ -1,27 +1,70 @@
+import { useRouter } from 'expo-router';
+import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, View } from 'react-native';
+
+import { StreakCard } from '../../components/screens/home/StreakCard';
+import { TodayWorkoutCard } from '../../components/screens/home/TodayWorkoutCard';
+import { WeekProgressGrid } from '../../components/screens/home/WeekProgressGrid';
+import {
+  getActiveSession,
+  getTodayWorkout,
+  getWeekProgress,
+} from '../../src/selectors';
+import { useStore } from '../../src/store';
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const user = useStore((s) => s.user);
+  const workouts = useStore((s) => s.workouts);
+  const sessions = useStore((s) => s.sessions);
+  const streak = useStore((s) => s.streak);
+
+  const today = getTodayWorkout({ workouts, sessions });
+  const week = getWeekProgress({ sessions, workouts });
+  const active = getActiveSession({ sessions });
+
+  const targetWorkout = active
+    ? workouts.find((w) => w.id === active.workoutId) ?? today
+    : today;
+
+  const handleStart = () => {
+    if (!targetWorkout) return;
+    router.push({
+      pathname: '/execute/[workoutId]',
+      params: { workoutId: targetWorkout.id },
+    });
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-bg-0" edges={['top']}>
-      <View className="flex-1 px-6 pt-6">
-        <Text className="font-sans-medium text-[10px] uppercase tracking-[0.2em] text-fg-2">
-          Home
-        </Text>
-        <Text className="mt-2 font-display italic text-5xl tracking-display text-fg-0">
-          CoreUp
-        </Text>
-        <Text className="mt-4 font-sans text-sm leading-5 text-fg-1">
-          Placeholder. Streak, treino de hoje e progresso semanal entram aqui na Fase 3.
-        </Text>
-        <View className="mt-8 rounded-card border border-line bg-bg-1 p-6">
-          <Text className="font-sans-medium text-[10px] uppercase tracking-[0.2em] text-brand">
-            Streak
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 32 }}
+        showsVerticalScrollIndicator={false}>
+        <View className="px-6 pt-4">
+          <Text className="font-sans-medium text-[10px] uppercase tracking-[0.2em] text-fg-2">
+            Olá, {user.firstName}
           </Text>
-          <Text className="mt-1 font-display text-6xl tracking-display text-fg-0">0</Text>
-          <Text className="mt-1 font-sans text-sm text-fg-1">dias seguidos</Text>
+          <Text className="mt-1 font-display italic text-5xl leading-none tracking-display text-fg-0">
+            Bora treinar
+          </Text>
         </View>
-      </View>
+
+        <View className="mt-6 gap-4 px-6">
+          <StreakCard currentStreak={streak.current} longestStreak={streak.longest} />
+          {targetWorkout && (
+            <TodayWorkoutCard workout={targetWorkout} onStart={handleStart} />
+          )}
+          <WeekProgressGrid days={week} weekGoal={user.weekGoal} />
+        </View>
+
+        {active && (
+          <View className="mx-6 mt-4 rounded-card-sm border border-brand/40 bg-brand/10 p-4">
+            <Text className="font-sans-medium text-xs text-brand">
+              Treino em andamento — toque em &quot;Iniciar treino&quot; pra continuar.
+            </Text>
+          </View>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 }

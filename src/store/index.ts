@@ -32,7 +32,7 @@ interface StoreState {
 
 interface StoreActions {
   startSession: (workoutId: string) => string;
-  logSet: (sessionId: string, exerciseId: number, set: Omit<SetLog, 'completedAt'>) => SetLog;
+  logSet: (sessionId: string, exerciseId: number, set: Omit<SetLog, 'completedAt' | 'isPR'>) => SetLog;
   completeSession: (sessionId: string) => { newStreak: number; prs: PRDetection[] };
   cancelSession: (sessionId: string) => void;
   reset: () => void;
